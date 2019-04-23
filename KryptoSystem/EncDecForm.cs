@@ -12,7 +12,6 @@ namespace KryptoSystem
 
         const string EncrFolder = @"Encrypt\";
         const string DecrFolder = @"Decrypt\";
-        const string SrcFolder = @"docs\";
         const string PubKeyFile = "";
 
         const string keyName = "Key01";
@@ -28,7 +27,7 @@ namespace KryptoSystem
                 MessageBox.Show("Key not set.");
             else
             {
-                openFileDialog1.InitialDirectory = SrcFolder;
+                openFileDialog1.InitialDirectory = EncrFolder;
                 if (openFileDialog1.ShowDialog() == DialogResult.OK)
                 {
                     string fName = openFileDialog1.FileName;
@@ -46,7 +45,7 @@ namespace KryptoSystem
         private void buttonExportPublicKey_Click(object sender, EventArgs e)
         {
             String F = "";
-            saveFileDialog1.InitialDirectory = SrcFolder;
+            saveFileDialog1.InitialDirectory = EncrFolder;
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 F = saveFileDialog1.FileName;
@@ -58,13 +57,14 @@ namespace KryptoSystem
         private void buttonImportPublicKey_Click(object sender, EventArgs e)
         {
             String F = "";
-            openFileDialog1.InitialDirectory = SrcFolder;
+            string PubKeyFile = "";
+            openFileDialog1.InitialDirectory = EncrFolder;
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 F = openFileDialog1.FileName;
                 FileInfo fInfo = new FileInfo(F);
 
-                string PubKeyFile = fInfo.FullName;
+                PubKeyFile = fInfo.FullName;
             }
 
             StreamReader sr = new StreamReader(PubKeyFile);
