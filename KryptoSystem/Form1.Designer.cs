@@ -28,39 +28,40 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.encDecBtn = new System.Windows.Forms.Button();
-            this.sigBtn = new System.Windows.Forms.Button();
-            this.SuspendLayout();
-            // 
-            // encDecBtn
-            // 
-            this.encDecBtn.Location = new System.Drawing.Point(12, 12);
-            this.encDecBtn.Name = "encDecBtn";
-            this.encDecBtn.Size = new System.Drawing.Size(246, 46);
-            this.encDecBtn.TabIndex = 0;
-            this.encDecBtn.Text = "Encode/Decode";
-            this.encDecBtn.UseVisualStyleBackColor = true;
-            this.encDecBtn.Click += new System.EventHandler(this.encDecBtn_Click);
-            // 
-            // sigBtn
-            // 
-            this.sigBtn.Location = new System.Drawing.Point(12, 83);
-            this.sigBtn.Name = "sigBtn";
-            this.sigBtn.Size = new System.Drawing.Size(246, 46);
-            this.sigBtn.TabIndex = 1;
-            this.sigBtn.Text = "Signature";
-            this.sigBtn.UseVisualStyleBackColor = true;
-            // 
-            // Form1
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(270, 157);
-            this.Controls.Add(this.sigBtn);
-            this.Controls.Add(this.encDecBtn);
-            this.Name = "Form1";
-            this.Text = "System";
-            this.ResumeLayout(false);
+			this.encDecBtn = new System.Windows.Forms.Button();
+			this.sigBtn = new System.Windows.Forms.Button();
+			this.SuspendLayout();
+			// 
+			// encDecBtn
+			// 
+			this.encDecBtn.Location = new System.Drawing.Point(12, 12);
+			this.encDecBtn.Name = "encDecBtn";
+			this.encDecBtn.Size = new System.Drawing.Size(246, 46);
+			this.encDecBtn.TabIndex = 0;
+			this.encDecBtn.Text = "Encode/Decode";
+			this.encDecBtn.UseVisualStyleBackColor = true;
+			this.encDecBtn.Click += new System.EventHandler(this.encDecBtn_Click);
+			// 
+			// sigBtn
+			// 
+			this.sigBtn.Location = new System.Drawing.Point(12, 83);
+			this.sigBtn.Name = "sigBtn";
+			this.sigBtn.Size = new System.Drawing.Size(246, 46);
+			this.sigBtn.TabIndex = 1;
+			this.sigBtn.Text = "Signature";
+			this.sigBtn.UseVisualStyleBackColor = true;
+			this.sigBtn.Click += new System.EventHandler(this.signatureBtn_Click);
+			// 
+			// Form1
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.ClientSize = new System.Drawing.Size(270, 157);
+			this.Controls.Add(this.sigBtn);
+			this.Controls.Add(this.encDecBtn);
+			this.Name = "Form1";
+			this.Text = "System";
+			this.ResumeLayout(false);
 
         }
 

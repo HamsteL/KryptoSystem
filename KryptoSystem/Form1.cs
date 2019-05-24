@@ -22,5 +22,11 @@ namespace KryptoSystem
             EncDecForm encDecForm = new EncDecForm();
             encDecForm.Show();
         }
-    }
+
+		private void signatureBtn_Click(object sender, EventArgs e)
+		{
+			Signature signatureForm= new Signature();
+			signatureForm.Show();
+		}
+	}
 }

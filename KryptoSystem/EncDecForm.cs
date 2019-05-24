@@ -10,25 +10,34 @@ namespace KryptoSystem
         CspParameters cspp = new CspParameters();
         RSACryptoServiceProvider rsa;
 
+        Crypto crypto = new Crypto();
+        xmlWorker XmlWorker = new xmlWorker();
+
         const string EncrFolder = @"Encrypt\";
         const string DecrFolder = @"Decrypt\";
-        const string SrcFolder = @"docs\";
+        const string PubKey = @"PubKey\";
+
         const string PubKeyFile = "";
 
-        const string keyName = "Key01";
+        string keyName = "";
 
         public EncDecForm()
         {
             InitializeComponent();
+            System.IO.Directory.CreateDirectory("Encrypt");
+            System.IO.Directory.CreateDirectory("Decrypt");
+            System.IO.Directory.CreateDirectory("PubKey");
+
         }
 
+        //Шифрование файла
         private void buttonEncryptFile_Click(object sender, EventArgs e)
         {
             if (rsa == null)
                 MessageBox.Show("Key not set.");
             else
             {
-                openFileDialog1.InitialDirectory = SrcFolder;
+                openFileDialog1.InitialDirectory = EncrFolder;
                 if (openFileDialog1.ShowDialog() == DialogResult.OK)
                 {
                     string fName = openFileDialog1.FileName;
@@ -43,56 +52,133 @@ namespace KryptoSystem
             }
         }
 
+        //Экспорт приватного ключа
         private void buttonExportPublicKey_Click(object sender, EventArgs e)
         {
-            String F = "";
-            saveFileDialog1.InitialDirectory = SrcFolder;
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            if (keyName != "")
             {
-                F = saveFileDialog1.FileName;
+                String F = "";
+                string name = "";
+                saveFileDialog1.InitialDirectory = EncrFolder;
+                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    F = saveFileDialog1.FileName;
+                    name = saveFileDialog1.FileName;
+                    System.IO.File.WriteAllText(F, rsa.ToXmlString(false));
+                }
 
-                System.IO.File.WriteAllText(F, rsa.ToXmlString(false));
+                if (XmlWorker.writeCsppName(name, keyName) != false)
+                    MessageBox.Show("Имя контейнера записано в " + name);
+
+                MessageBox.Show("Публичный ключ успешно экспортирован");
+
+            }
+            else
+            {
+                MessageBox.Show("Сначала создайте ключи.");
             }
         }
 
+        //Импорт публичного ключа
         private void buttonImportPublicKey_Click(object sender, EventArgs e)
         {
             String F = "";
-            openFileDialog1.InitialDirectory = SrcFolder;
+            string PubKeyFile = "";
+            openFileDialog1.InitialDirectory = PubKey;
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 F = openFileDialog1.FileName;
                 FileInfo fInfo = new FileInfo(F);
 
-                string PubKeyFile = fInfo.FullName;
+                PubKeyFile = fInfo.FullName;
             }
 
-            StreamReader sr = new StreamReader(PubKeyFile);
-            cspp.KeyContainerName = keyName;
-            rsa = new RSACryptoServiceProvider(cspp);
-            string keytxt = sr.ReadToEnd();
-            rsa.FromXmlString(keytxt);
-            rsa.PersistKeyInCsp = true;
-            if (rsa.PublicOnly == true)
-                label1.Text = "Key: " + cspp.KeyContainerName + " - Public Only";
-            else
-                label1.Text = "Key: " + cspp.KeyContainerName + " - Full Key Pair";
-            sr.Close();
+            try
+            {
+                StreamReader sr = new StreamReader(PubKeyFile);
+                cspp.KeyContainerName = keyName;
+                rsa = new RSACryptoServiceProvider(cspp);
+                string keytxt = sr.ReadToEnd();
+                rsa.FromXmlString(keytxt);
+                rsa.PersistKeyInCsp = true;
+                if (rsa.PublicOnly == true)
+                    label1.Text += "\n Сompanion Public Key: " + cspp.KeyContainerName + " - Public Only";
+                else
+                    label1.Text += "\n Сompanion Public Key: " + cspp.KeyContainerName + " - Full Key Pair";
+                sr.Close();
+            }
+            catch (Exception evt)
+            {
+                MessageBox.Show(evt.ToString());
+            }
         }
 
+        //получение пары ключей
         private void buttonGetPrivateKey_Click(object sender, EventArgs e)
         {
-            cspp.KeyContainerName = keyName;
+            string name = "";
+            openFileDialog1.InitialDirectory = PubKey;
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                string fName = openFileDialog1.FileName;
+                if (fName != null)
+                {
+                    FileInfo fInfo = new FileInfo(fName);
 
+                    name = fInfo.FullName;
+                }
+            }
+            if (name != "")
+            {
+                //Получение имени контейнера из файла
+                keyName = XmlWorker.getCsppName(name);
+
+                if (keyName != "")
+                {
+                    cspp.KeyContainerName = keyName;
+
+                    rsa = new RSACryptoServiceProvider(cspp);
+                    rsa.PersistKeyInCsp = true;
+
+                    if (rsa.PublicOnly == true)
+                        label1.Text += "\n Your Key: " + cspp.KeyContainerName + " - Public Only";
+                    else
+                    {
+                        label1.Text += "\n Your Key: " + cspp.KeyContainerName + " - Full Key Pair";
+
+                        String F = PubKey + "/Key";
+
+                        System.IO.File.WriteAllText(F, rsa.ToXmlString(false));
+
+                    }
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Невозможно импортировать ключ");
+            }
+
+        }
+
+        //генерация ключей для RSA
+        private void buttonCreateAsmKeys_Click(object sender, EventArgs e)
+        {
+            keyName = crypto.createKeys();
+            MessageBox.Show("Создан контейнер: " + keyName);
+
+            cspp.KeyContainerName = keyName;
             rsa = new RSACryptoServiceProvider(cspp);
             rsa.PersistKeyInCsp = true;
-
             if (rsa.PublicOnly == true)
                 label1.Text = "Key: " + cspp.KeyContainerName + " - Public Only";
             else
                 label1.Text = "Key: " + cspp.KeyContainerName + " - Full Key Pair";
+
+
         }
 
+        //расшифровать файл
         private void buttonDecryptFile_Click(object sender, EventArgs e)
         {
             if (rsa == null)
@@ -100,7 +186,7 @@ namespace KryptoSystem
             else
             {
 
-                openFileDialog2.InitialDirectory = EncrFolder;
+                openFileDialog2.InitialDirectory = DecrFolder;
                 if (openFileDialog2.ShowDialog() == DialogResult.OK)
                 {
                     string fName = openFileDialog2.FileName;
@@ -112,18 +198,6 @@ namespace KryptoSystem
                     }
                 }
             }
-        }
-
-        private void buttonCreateAsmKeys_Click(object sender, EventArgs e)
-        {
-
-            cspp.KeyContainerName = keyName;
-            rsa = new RSACryptoServiceProvider(cspp);
-            rsa.PersistKeyInCsp = true;
-            if (rsa.PublicOnly == true)
-                label1.Text = "Key: " + cspp.KeyContainerName + " - Public Only";
-            else
-                label1.Text = "Key: " + cspp.KeyContainerName + " - Full Key Pair";
         }
 
         private void EncryptFile(string inFile)
